@@ -47,6 +47,8 @@ def check_block(savings_range, down_payment_needed, salary, steps=0):
     # otherwise, the list is more than one element; bisect it and figure out which half to dig into
     midpoint = len(savings_range) // 2
     amount_saved = calculate_amount_saved(salary, savings_range[midpoint])
+    if savings_rate_ok(down_payment_needed, amount_saved):
+        return True, savings_range[midpoint], steps
     if amount_saved < down_payment_needed:
         return check_block(savings_range[midpoint:], down_payment_needed, salary, steps + 1)
     else:
