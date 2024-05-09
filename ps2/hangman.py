@@ -1,31 +1,24 @@
 # Problem Set 2, hangman.py
-# Name: 
-# Collaborators:
-# Time spent:
+# Name: AC Capehart
+# Collaborators: None
+# Time spent: ~2 hours
 
-# Hangman Game
-# -----------------------------------
-# Helper code
-# You don't need to understand this helper code,
-# but you will have to know how to use the functions
-# (so be sure to read the docstrings!)
 import random
 import string
 
-WORDLIST_FILENAME = "words.txt"
-
 
 class HangmanGame:
-    def __init__(self, secret_word, allow_hints=False):
-        self.secret_word = secret_word
+    def __init__(self, secret_word=None, allow_hints=False):
+        self.wordlist = load_words()
+        self.secret_word = secret_word or choose_word(self.wordlist)
         self.letters_guessed = []
         self.guesses_remaining = 6
         self.warnings_remaining = 3
         self.separator = "-" * 10
         self.allow_hints = allow_hints
-        self.guessed_word = get_guessed_word(secret_word, self.letters_guessed)
+        self.guessed_word = get_guessed_word(self.secret_word, self.letters_guessed)
         print("Welcome to the game Hangman!")
-        print(f"I am thinking of a word that is {len(secret_word)} letters long.")
+        print(f"I am thinking of a word that is {len(self.secret_word)} letters long.")
         print(self.separator)
         self.play()
 
@@ -38,12 +31,6 @@ class HangmanGame:
         if letter in self.secret_word:
             return True
         return False
-
-    def get_guessed_word(self):
-        return get_guessed_word(self.secret_word, self.letters_guessed)
-
-    def get_available_letters(self):
-        return get_available_letters(self.letters_guessed)
 
     def get_guesses_remaining(self):
         return self.guesses_remaining
@@ -65,24 +52,33 @@ class HangmanGame:
                 if self.get_warnings_remaining() > 0:
                     self.decrement_warnings_remaining()
                     print(
-                        f"Oops! You've already guessed that letter.Oops! You've already guessed that letter. You now have {self.get_warnings_remaining()} warnings left. {get_guessed_word(self.secret_word, self.letters_guessed)}")
+                        "Oops! You've already guessed that letter.Oops! "
+                        "You've already guessed that letter. You now "
+                        "have {self.get_warnings_remaining()} warnings left. "
+                        f"{get_guessed_word(self.secret_word, self.letters_guessed)}")
                 else:
                     self.decrement_guesses_remaining()
                     print(
-                        f"Oops! You've already guessed that letter. You have no warnings left so you lose one guess. {get_guessed_word(self.secret_word, self.letters_guessed)}")
+                        "Oops! You've already guessed that letter. "
+                        "You have no warnings left so you lose one guess. "
+                        f"{get_guessed_word(self.secret_word, self.letters_guessed)}")
                 continue
             if guess not in string.ascii_lowercase:
                 if self.allow_hints and guess == "*":
-                    show_possible_matches(get_guessed_word(self.secret_word, self.letters_guessed))
+                    show_possible_matches(get_guessed_word(self.secret_word, self.letters_guessed), self.wordlist)
                     continue
                 if self.get_warnings_remaining() > 0:
                     self.decrement_warnings_remaining()
                     print(
-                        f"Oops! That is not a valid letter.You have {self.get_warnings_remaining()} warnings left: {get_guessed_word(self.secret_word, self.letters_guessed)}")
+                        "Oops! That is not a valid letter. "
+                        f"You have {self.get_warnings_remaining()} warnings left: "
+                        f"{get_guessed_word(self.secret_word, self.letters_guessed)}")
                 else:
                     self.decrement_guesses_remaining()
                     print(
-                        f"Oops! That is not a valid letter. You have no warnings left so you lose one guess: {get_guessed_word(self.secret_word, self.letters_guessed)}")
+                        "Oops! That is not a valid letter. "
+                        "You have no warnings left so you lose one guess: "
+                        f"{get_guessed_word(self.secret_word, self.letters_guessed)}")
                 continue
 
             result = self.guess(guess)
@@ -104,7 +100,6 @@ class HangmanGame:
             print(f"Sorry, you ran out of guesses. The word was {self.secret_word}")
 
 
-
 def load_words():
     """
     Returns a list of valid words. Words are strings of lowercase letters.
@@ -112,11 +107,12 @@ def load_words():
     Depending on the size of the word list, this function may
     take a while to finish.
     """
+    wordlist_filename = "words.txt"
+
     print("Loading word list from file...")
-    # inFile: file
-    inFile = open(WORDLIST_FILENAME, 'r')
+    in_file = open(wordlist_filename, 'r')
     # line: string
-    line = inFile.readline()
+    line = in_file.readline()
     # wordlist: list of strings
     wordlist = line.split()
     print("  ", len(wordlist), "words loaded.")
@@ -136,11 +132,6 @@ def choose_word(wordlist):
 
 # -----------------------------------
 
-# Load the list of words into the variable wordlist
-# so that it can be accessed from anywhere in the program
-wordlist = load_words()
-
-
 def is_word_guessed(secret_word, letters_guessed):
     """
     Take a list of letters that have been guessed and return True
@@ -153,9 +144,9 @@ def is_word_guessed(secret_word, letters_guessed):
     :return: boolean, True if all the letters of secret_word are in letters_guessed;
       False otherwise
     """
-    swset = set(secret_word)
-    lgset = set(letters_guessed)
-    return swset.issubset(lgset)
+    secret_word_set = set(secret_word)
+    letters_guessed_set = set(letters_guessed)
+    return secret_word_set.issubset(letters_guessed_set)
 
 
 def get_guessed_word(secret_word, letters_guessed):
@@ -190,7 +181,7 @@ def get_available_letters(letters_guessed):
     return available
 
 
-def hangman(secret_word):
+def hangman(secret_word=None):
     """
     secret_word: string, the secret word to guess.
 
@@ -215,16 +206,7 @@ def hangman(secret_word):
 
     Follows the other limitations detailed in the problem write-up.
     """
-    game = HangmanGame(secret_word)
-
-
-# When you've completed your hangman function, scroll down to the bottom
-# of the file and uncomment the first two lines to test
-# (hint: you might want to pick your own
-# secret_word while you're doing your own testing)
-
-
-# -----------------------------------
+    HangmanGame(secret_word)
 
 
 def match_with_gaps(my_word, other_word):
@@ -246,7 +228,8 @@ def match_with_gaps(my_word, other_word):
             return False
     return True
 
-def show_possible_matches(my_word):
+
+def show_possible_matches(my_word, wordlist):
     """
     my_word: string with _ characters, current guess of secret word
     returns: nothing, but should print out every word in wordlist that matches my_word
@@ -263,7 +246,8 @@ def show_possible_matches(my_word):
     if matched:
         print(" ".join(matched))
 
-def hangman_with_hints(secret_word):
+
+def hangman_with_hints(secret_word=None):
     """
     secret_word: string, the secret word to guess.
 
@@ -290,7 +274,7 @@ def hangman_with_hints(secret_word):
 
     Follows the other limitations detailed in the problem write-up.
     """
-    game = HangmanGame(secret_word, allow_hints=True)
+    HangmanGame(secret_word, allow_hints=True)
 
 
 # When you've completed your hangman_with_hint function, comment the two similar
@@ -300,10 +284,9 @@ def hangman_with_hints(secret_word):
 
 
 if __name__ == "__main__":
-    secret_word = choose_word(wordlist)
     hints = input("Do you want to play with hints? (y/N): ").lower()
     if hints and hints.startswith("y"):
         print("Hints are enabled. Use * to show possible matches.")
-        hangman_with_hints(secret_word)
+        hangman_with_hints()
     else:
-        hangman(secret_word)
+        hangman()
