@@ -1,0 +1,1 @@
+During the spring and summer of 2024, I watched and "studied" the [MIT Open Courseware CS 6.0001](https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/) course with Sam. This is my work on the problem sets.
